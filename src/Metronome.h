@@ -1,12 +1,12 @@
 #ifndef METRONOME_H
 #define METRONOME_H
 
-#include "DayImages.h"
+#include "TimeRepresentation.h"
 
 class Metronome
 {
 public:
-    Metronome( DayImages* images, int iteration, float x, float y, float width, float height, unsigned int frames = 0 );
+    Metronome( TimeRepresentation* timeRepresentation, int iteration, float x, float y, float width, float height, unsigned int frames = 0 );
     virtual ~Metronome();
 
     void update();
@@ -19,7 +19,7 @@ private:
     float width;
     float height;
     unsigned int frames;
-    DayImages* images;
+    TimeRepresentation* timeRepresentation;
 
     unsigned int iteration;
     unsigned int currentFrame;

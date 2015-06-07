@@ -1,18 +1,19 @@
 #include "Metronome.h"
 #include <stdlib.h>
+#include "ofMain.h"
 
 const int Metronome::DIRECTION_FORWARD = 1;
 const int Metronome::DIRECTION_BACKWARDS = 2;
 const int Metronome::DIRECTION_STOPPED = 3;
 const int Metronome::MAX_ITERATION = 8;
 
-Metronome::Metronome( DayImages* images, int iteration, float x, float y, float width, float height, unsigned int frames )
+Metronome::Metronome( TimeRepresentation* timeRepresentation, int iteration, float x, float y, float width, float height, unsigned int frames )
 {
     this->x = x;
     this->y = y;
     this->width = width;
     this->height = height;
-    this->images = images;
+    this->timeRepresentation = timeRepresentation;
     this->iteration = iteration;
 
     if (frames > 0) {
@@ -65,18 +66,18 @@ void Metronome::update()
 
                     // splits the metronome in two
                     if (this->width > this->height) {
-                        this->firstHalf = new Metronome( this->images, this->iteration + 1,
+                        this->firstHalf = new Metronome( this->timeRepresentation, this->iteration + 1,
                                                         this->x, this->y, this->width / 2, this->height,
                                                         this->frames );
-                        this->secondHalf = new Metronome( this->images, this->iteration + 1,
+                        this->secondHalf = new Metronome( this->timeRepresentation, this->iteration + 1,
                                                          this->x + this->width / 2, this->y, this->width / 2, this->height,
                                                          0 );
                     }
                     else {
-                        this->firstHalf = new Metronome( this->images, this->iteration + 1,
+                        this->firstHalf = new Metronome( this->timeRepresentation, this->iteration + 1,
                                                         this->x, this->y, this->width, this->height / 2,
                                                         this->frames );
-                        this->secondHalf = new Metronome( this->images, this->iteration + 1,
+                        this->secondHalf = new Metronome( this->timeRepresentation, this->iteration + 1,
                                                          this->x, this->y + this->height / 2, this->width, this->height / 2,
                                                          0 );
                     }
@@ -117,7 +118,7 @@ void Metronome::draw()
     }
     else {
         float time = ((float) this->currentFrame) / (float) this->frames;
-        this->images->draw( time, this->x, this->y, this->width, this->height );
+        this->timeRepresentation->draw( time, this->x, this->y, this->width, this->height );
     }
 }
 

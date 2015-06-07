@@ -1,14 +1,14 @@
 #pragma once
 
 #include "ofMain.h"
-#include "DayImages.h"
+#include "GrayscaleSequence.h"
 #include "Metronome.h"
 
 class ofApp : public ofBaseApp{
 
 private:
     Metronome* metronome;
-    DayImages* images;
+    GrayscaleSequence* grayscale;
 
 	public:
 		void setup();
