@@ -3,12 +3,14 @@
 #include "ofMain.h"
 #include "GrayscaleSequence.h"
 #include "Metronome.h"
+#include "Timelapse.h"
 
 class ofApp : public ofBaseApp{
 
 private:
     Metronome* metronome;
     GrayscaleSequence* grayscale;
+    Timelapse* timelapse;
 
 	public:
 		void setup();

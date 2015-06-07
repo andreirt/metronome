@@ -5,7 +5,7 @@
 const int Metronome::DIRECTION_FORWARD = 1;
 const int Metronome::DIRECTION_BACKWARDS = 2;
 const int Metronome::DIRECTION_STOPPED = 3;
-const int Metronome::MAX_ITERATION = 8;
+const int Metronome::MAX_ITERATION = 12;
 
 Metronome::Metronome( TimeRepresentation* timeRepresentation, int iteration, float x, float y, float width, float height, unsigned int frames )
 {

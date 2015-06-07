@@ -3,8 +3,10 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
 
-    this->grayscale = new GrayscaleSequence();
-    this->metronome = new Metronome( this->grayscale, 0, 0, 0, ofGetWidth(), ofGetHeight(), 600 );
+    //this->grayscale = new GrayscaleSequence();
+
+    this->timelapse = new Timelapse("ampulheta_");
+    this->metronome = new Metronome( this->timelapse, 0, 0, 0, ofGetWidth(), ofGetHeight(), 600 );
 
     ofSetFrameRate(60);
     ofBackground(0, 0, 0);
