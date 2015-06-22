@@ -11,6 +11,9 @@ public:
 
     void update();
     void draw();
+    int getNumChildren();
+    static void startCycle();
+
 
 protected:
 private:
@@ -27,6 +30,8 @@ private:
     Metronome* firstHalf;
     Metronome* secondHalf;
     bool hasBeenDivided;
+    int id;
+
 
     static const int DIRECTION_FORWARD;
     static const int DIRECTION_BACKWARDS;

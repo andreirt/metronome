@@ -3,18 +3,24 @@
 //--------------------------------------------------------------
 void ofApp::setup(){
 
-    //this->grayscale = new GrayscaleSequence();
+    this->grayscale = new GrayscaleSequence();
 
-    this->timelapse = new Timelapse("ampulheta_");
-    this->metronome = new Metronome( this->timelapse, 0, 0, 0, ofGetWidth(), ofGetHeight(), 600 );
+    this->timelapse = new Timelapse("imagem_");
+    this->metronome = new Metronome( this->timelapse, 0, 0, 0, ofGetWidth(), ofGetHeight(), 1000 );
 
     ofSetFrameRate(60);
     ofBackground(0, 0, 0);
+
+
 }
+
+static int previousMetronomes = 0;
 
 //--------------------------------------------------------------
 void ofApp::update(){
+    Metronome::startCycle();
     this->metronome->update();
+
 }
 
 //--------------------------------------------------------------

@@ -3,8 +3,8 @@
 Timelapse::Timelapse( string prefix )
 {
     this->prefix = prefix;
-    this->filenames.resize(44, "");
-    this->images.resize(44);
+    this->filenames.clear();
+    this->images.clear();
 
     ofDirectory dataFolder(".");
     dataFolder.allowExt("png");
@@ -13,17 +13,18 @@ Timelapse::Timelapse( string prefix )
 
         string filename = dataFolder.getName(i);
         if (filename.find(prefix) == 0) {
-
-            string temp = filename.substr( prefix.length(), string::npos );
-            string fileNumber = temp.substr( 0, temp.length() - 4); // ".png"
-            int index = ofToInt(fileNumber);
-            this->filenames[ index ] = filename;
-
-            ofLog() << "index: " << index << ", " << filename;
-
+            this->filenames.push_back(filename);
         }
 
     }
+
+    // ordena a lista de nomes
+    std::sort (this->filenames.begin(), this->filenames.end());
+
+    while (this->filenames.size() > 100)
+        this->filenames.pop_back();
+
+    this->images.resize( this->filenames.size() );
 }
 
 Timelapse::~Timelapse()

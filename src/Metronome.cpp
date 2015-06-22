@@ -5,7 +5,15 @@
 const int Metronome::DIRECTION_FORWARD = 1;
 const int Metronome::DIRECTION_BACKWARDS = 2;
 const int Metronome::DIRECTION_STOPPED = 3;
-const int Metronome::MAX_ITERATION = 12;
+const int Metronome::MAX_ITERATION = 7;
+
+static int counter = 0;
+static int cycle_counter = 0;
+
+void Metronome::startCycle()
+{
+    cycle_counter = 0;
+}
 
 Metronome::Metronome( TimeRepresentation* timeRepresentation, int iteration, float x, float y, float width, float height, unsigned int frames )
 {
@@ -20,7 +28,7 @@ Metronome::Metronome( TimeRepresentation* timeRepresentation, int iteration, flo
          this->frames = frames;
     }
     else {
-         this->frames = 300 + (rand() % 300);
+         this->frames = 500 + (rand() % 500);
     }
 
     this->firstHalf = NULL;
@@ -28,6 +36,8 @@ Metronome::Metronome( TimeRepresentation* timeRepresentation, int iteration, flo
     this->currentFrame = 0;
     this->direction = Metronome::DIRECTION_FORWARD;
     this->hasBeenDivided = false;
+
+    this->id = counter++;
 }
 
 Metronome::~Metronome()
@@ -51,14 +61,18 @@ void Metronome::update()
 {
     if (this->firstHalf == NULL && this->secondHalf == NULL) {
         if (this->direction == Metronome::DIRECTION_FORWARD) {
+
             ++this->currentFrame;
+
             if (this->currentFrame > this->frames) {
                 this->currentFrame = this->frames - 1;
                 this->direction = Metronome::DIRECTION_BACKWARDS;
             }
         }
         else if (this->direction == Metronome::DIRECTION_BACKWARDS) {
+
             --this->currentFrame;
+
             if (this->currentFrame == 0) {
                 if (!this->hasBeenDivided && this->iteration < Metronome::MAX_ITERATION) {
 
@@ -66,19 +80,27 @@ void Metronome::update()
 
                     // splits the metronome in two
                     if (this->width > this->height) {
-                        this->firstHalf = new Metronome( this->timeRepresentation, this->iteration + 1,
-                                                        this->x, this->y, this->width / 2, this->height,
+                        this->firstHalf = new Metronome( this->timeRepresentation,
+                                                        this->iteration + 1,
+                                                        this->x, this->y,
+                                                        this->width / 2, this->height,
                                                         this->frames );
-                        this->secondHalf = new Metronome( this->timeRepresentation, this->iteration + 1,
-                                                         this->x + this->width / 2, this->y, this->width / 2, this->height,
+                        this->secondHalf = new Metronome( this->timeRepresentation,
+                                                         this->iteration + 1,
+                                                         this->x + this->width / 2, this->y,
+                                                         this->width / 2, this->height,
                                                          0 );
                     }
                     else {
-                        this->firstHalf = new Metronome( this->timeRepresentation, this->iteration + 1,
-                                                        this->x, this->y, this->width, this->height / 2,
+                        this->firstHalf = new Metronome( this->timeRepresentation,
+                                                        this->iteration + 1,
+                                                        this->x, this->y,
+                                                        this->width, this->height / 2,
                                                         this->frames );
-                        this->secondHalf = new Metronome( this->timeRepresentation, this->iteration + 1,
-                                                         this->x, this->y + this->height / 2, this->width, this->height / 2,
+                        this->secondHalf = new Metronome( this->timeRepresentation,
+                                                         this->iteration + 1,
+                                                         this->x, this->y + this->height / 2,
+                                                         this->width, this->height / 2,
                                                          0 );
                     }
 
@@ -108,6 +130,7 @@ void Metronome::update()
             ofLog() << "joined: " << this->x << ", " << this->y << ", " << this->width << ", " << this->height;
         }
     }
+
 }
 
 void Metronome::draw()
@@ -121,4 +144,3 @@ void Metronome::draw()
         this->timeRepresentation->draw( time, this->x, this->y, this->width, this->height );
     }
 }
-
