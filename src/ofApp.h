@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "ofMain.h"
 #include "GrayscaleSequence.h"
@@ -9,6 +9,8 @@
 class ofApp : public ofBaseApp{
 
 private:
+    ofVideoGrabber* grabber;
+
     Metronome* metronome;
     GrayscaleSequence* grayscale;
     Timelapse* timelapse;
@@ -17,6 +19,32 @@ private:
     ofxUICanvas *recordPanel;
     ofxUICanvas *reproductionPanel;
     ofxUICanvas *imagePanel;
+
+    ofxUIToggle *recordToggle;
+    ofxUIToggle *reproductionToggle;
+
+    ofxUIToggle* zeroRotationToggle;
+    ofxUIToggle* ninetyRotationToggle;
+    ofxUIToggle* oneHundredEightyRotationToggle;
+    ofxUIToggle* twoHundredSeventyRotationToggle;
+    int rotations;
+
+    ofxUIToggle* showAtStartupToggle;
+
+    ofxUIToggle* fullScreenToggle;
+
+    std::vector<ofxUITextInput*> textInputs;
+    ofxUIDropDownList* cameraList;
+
+    ofxUITextInput *cameraWidthTextInput;
+    ofxUITextInput *cameraHeightTextInput;
+
+    ofxUITextInput *intervalToSaveTextInput;
+    int intervalToSaveImage;
+
+    ofxUITextInput *imagePrefixTextInput;
+    ofxUITextInput *cycleMaxTimeTextInput;
+    ofxUITextInput *divisionsMaxNumberTextInput;
 
     const static string RECORD_LABEL;
     const static string CAMERA_LABEL;
@@ -52,5 +80,14 @@ private:
 		void windowResized(int w, int h);
 		void dragEvent(ofDragInfo dragInfo);
 		void gotMessage(ofMessage msg);
+
+        void guiEvent(ofxUIEventArgs &e);
+        void recordPanelEvent(ofxUIEventArgs &e);
+        void reproductionPanelEvent(ofxUIEventArgs &e);
+		void hideConfigurationPanel();
+		void showConfigurationPanel();
+		void showRecordPanel();
+		void showReproductionPanel();
+		void unfocusAllTextInputs(ofxUITextInput* except);
 
 };
