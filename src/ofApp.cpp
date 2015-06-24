@@ -19,13 +19,14 @@ const string ofApp::ITERATION_NUMBER_LABEL = "Número máximo de divisões";
 const string ofApp::GENERAL_LABEL = "Opções gerais";
 const string ofApp::FULL_SCREEN_LABEL = "Tela cheia";
 const string ofApp::SHOW_ON_START_LABEL = "Exibir essa tela ao iniciar";
+const string ofApp::SAVE_LABEL = "Salvar";
+const string ofApp::CANCEL_LABEL = "Cancelar";
+const string ofApp::SUPPORT_BUTTON_NAME = "support";
 
 
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-    this->grabber = new ofVideoGrabber();
-
     this->grayscale = new GrayscaleSequence();
 
     this->timelapse = new Timelapse("imagem_");
@@ -33,6 +34,8 @@ void ofApp::setup(){
 
     ofSetFrameRate(60);
     ofBackground(0, 0, 0);
+
+    this->grabber = new ofVideoGrabber();
 
     this->gui = new ofxUICanvas(0, 0, ofGetWidth(), ofGetHeight());
     this->gui->setWidgetSpacing(10);
@@ -54,23 +57,28 @@ void ofApp::setup(){
 
     this->recordToggle = new ofxUIToggle(ofApp::RECORD_LABEL, true, 16, 16);
     this->recordToggle->setDrawOutline(true);
-    this->gui->addWidgetDown(recordToggle);
+    this->gui->addWidgetDown(this->recordToggle);
 
     this->reproductionToggle = new ofxUIToggle(ofApp::REPRODUCTION_LABEL, true, 16, 16);
     this->reproductionToggle->setDrawOutline(true);
-    this->gui->addWidgetRight(reproductionToggle);
+    this->gui->addWidgetRight(this->reproductionToggle);
 
     this->gui->addSpacer("spacer", 1) ;
 
-    this->recordPanel = new ofxUICanvas(0, 0, ofGetWidth(), 260);
+    this->recordPanel = new ofxUICanvas (0, 0, 450, 260);
     this->recordPanel->setFontSize(OFX_UI_FONT_SMALL, 8);
     this->recordPanel->setWidgetSpacing(10);
     this->gui->addWidgetSouthOf(this->recordPanel, "spacer");
 
-    /*this->reproductionPanel = new ofxUICanvas(0, 0, 300, 260);
+    this->rotationPanel = new ofxUICanvas(0, 0, 300, 260);
+    this->rotationPanel->setFontSize(OFX_UI_FONT_SMALL, 8);
+    this->rotationPanel->setWidgetSpacing(10);
+    this->gui->addWidgetRight(this->rotationPanel);
+
+    this->reproductionPanel = new ofxUICanvas(0, 0, ofGetWidth(), 260);
     this->reproductionPanel->setFontSize(OFX_UI_FONT_SMALL, 8);
     this->reproductionPanel->setWidgetSpacing(10);
-    this->gui->addWidgetSouthOf(this->reproductionPanel, "spacer");*/
+    this->gui->addWidgetSouthOf(this->reproductionPanel, "spacer");
 
 
     vector<ofVideoDevice> devices = this->grabber->listDevices();
@@ -82,11 +90,12 @@ void ofApp::setup(){
         cameras->push_back(device.deviceName);
     }
 
+    this->selectedCameraIndex = 1;
     this->cameraList = this->recordPanel->addDropDownList(ofApp::CAMERA_LABEL, *cameras, 300, 10);
     this->cameraList->setAllowMultiple(false);
     this->cameraList->setDrawOutline(true);
 
-    this->recordPanel->addWidgetDown( new ofxUILabel(170, ofApp::IMAGE_WIDTH_LABEL, OFX_UI_FONT_SMALL) );
+    this->recordPanel->addWidgetDown( new ofxUILabel(180, ofApp::IMAGE_WIDTH_LABEL, OFX_UI_FONT_SMALL) );
     this->cameraWidthTextInput = new ofxUITextInput("CameraWidth", "1920", 80, 18);
     this->cameraWidthTextInput->setOnlyNumericInput(true);
     this->cameraWidthTextInput->setDrawOutline(true);
@@ -94,7 +103,7 @@ void ofApp::setup(){
     this->recordPanel->addWidgetRight(this->cameraWidthTextInput);
     this->textInputs.push_back(this->cameraWidthTextInput);
 
-    this->recordPanel->addWidgetDown( new ofxUILabel(170, ofApp::IMAGE_HEIGHT_LABEL, OFX_UI_FONT_SMALL) );
+    this->recordPanel->addWidgetDown( new ofxUILabel(180, ofApp::IMAGE_HEIGHT_LABEL, OFX_UI_FONT_SMALL) );
     this->cameraHeightTextInput = new ofxUITextInput("CameraHeight", "1080", 80, 18);
     this->cameraHeightTextInput->setOnlyNumericInput(true);
     this->cameraHeightTextInput->setDrawOutline(true);
@@ -102,49 +111,114 @@ void ofApp::setup(){
     this->recordPanel->addWidgetRight(this->cameraHeightTextInput);
     this->textInputs.push_back(this->cameraHeightTextInput);
 
-    this->rotations = 0;
+    this->recordPanel->addWidgetDown(new ofxUILabel(180, ofApp::IMAGE_PREFIX_LABEL, OFX_UI_FONT_SMALL));
+    this->recordImagePrefixTextInput = new ofxUITextInput("ImagePrefix", "imagem_", 200, 18);
+    this->recordImagePrefixTextInput->setDrawOutline(true);
+    this->recordImagePrefixTextInput->setDrawOutlineHighLight(true);
+    this->recordPanel->addWidgetRight(this->recordImagePrefixTextInput);
+    this->textInputs.push_back(this->recordImagePrefixTextInput);
 
-    this->recordPanel->addLabel("Rotação da imagem", OFX_UI_FONT_SMALL);
-
-    this->zeroRotationToggle = new ofxUIToggle(ofApp::ZERO_DEGREES_LABEL, true, 16, 16);
-    this->zeroRotationToggle->setDrawOutline(true);
-    this->recordPanel->addWidgetDown(this->zeroRotationToggle);
-
-    this->ninetyRotationToggle = new ofxUIToggle(ofApp::NINETY_DEGREES_LABEL, true, 16, 16);
-    this->ninetyRotationToggle->setDrawOutline(true);
-    this->recordPanel->addWidgetDown(this->ninetyRotationToggle);
-
-    this->oneHundredEightyRotationToggle = new ofxUIToggle(ofApp::ONE_HUNDRED_EIGHTY_DEGREES_LABEL, true, 16, 16);
-    this->oneHundredEightyRotationToggle->setDrawOutline(true);
-    this->recordPanel->addWidgetDown(this->oneHundredEightyRotationToggle);
-
-    this->twoHundredSeventyRotationToggle = new ofxUIToggle(ofApp::TWO_HUNDRED_SEVENTY_DEGREES_LABEL, true, 16, 16);
-    this->twoHundredSeventyRotationToggle->setDrawOutline(true);
-    this->recordPanel->addWidgetDown(this->twoHundredSeventyRotationToggle);
-
-    this->recordPanel->addWidgetEastOf( new ofxUILabel(170, ofApp::IMAGE_PREFIX_LABEL, OFX_UI_FONT_SMALL) , "CameraWidth" );
-    this->imagePrefixTextInput = new ofxUITextInput("ImagePrefix", "imagem_", 200, 18);
-    this->imagePrefixTextInput->setDrawOutline(true);
-    this->imagePrefixTextInput->setDrawOutlineHighLight(true);
-    this->recordPanel->addWidgetRight(this->imagePrefixTextInput);
-    this->textInputs.push_back(this->imagePrefixTextInput);
-
-    this->recordPanel->addWidgetEastOf( new ofxUILabel(180, ofApp::SAVE_IMAGE_LABEL, OFX_UI_FONT_SMALL), "CameraHeight");
+    this->recordPanel->addWidgetDown(new ofxUILabel(180, ofApp::SAVE_IMAGE_LABEL, OFX_UI_FONT_SMALL));
     this->intervalToSaveTextInput = new ofxUITextInput("A cada", "15", 60, 18);
     this->intervalToSaveTextInput->setOnlyNumericInput(true);
     this->intervalToSaveTextInput->setDrawOutline(true);
     this->intervalToSaveTextInput->setDrawOutlineHighLight(true);
     this->recordPanel->addWidgetRight( this->intervalToSaveTextInput );
-    this->recordPanel->addWidgetRight( new ofxUILabel(170, "minutos", OFX_UI_FONT_SMALL) );
+    this->recordPanel->addWidgetRight( new ofxUILabel(10, "minutos", OFX_UI_FONT_SMALL) );
     this->textInputs.push_back(this->intervalToSaveTextInput);
 
+    this->rotations = 0;
+
+    this->rotationPanel->addLabel("Rotação da imagem", OFX_UI_FONT_SMALL);
+
+    this->zeroRotationToggle = new ofxUIToggle(ofApp::ZERO_DEGREES_LABEL, true, 16, 16);
+    this->zeroRotationToggle->setDrawOutline(true);
+    this->rotationPanel->addWidgetDown(this->zeroRotationToggle);
+
+    this->ninetyRotationToggle = new ofxUIToggle(ofApp::NINETY_DEGREES_LABEL, true, 16, 16);
+    this->ninetyRotationToggle->setDrawOutline(true);
+    this->rotationPanel->addWidgetDown(this->ninetyRotationToggle);
+
+    this->oneHundredEightyRotationToggle = new ofxUIToggle(ofApp::ONE_HUNDRED_EIGHTY_DEGREES_LABEL, true, 16, 16);
+    this->oneHundredEightyRotationToggle->setDrawOutline(true);
+    this->rotationPanel->addWidgetDown(this->oneHundredEightyRotationToggle);
+
+    this->twoHundredSeventyRotationToggle = new ofxUIToggle(ofApp::TWO_HUNDRED_SEVENTY_DEGREES_LABEL, true, 16, 16);
+    this->twoHundredSeventyRotationToggle->setDrawOutline(true);
+    this->rotationPanel->addWidgetDown(this->twoHundredSeventyRotationToggle);
 
 
+    this->reproductionPanel->addWidgetDown( new ofxUILabel(250, ofApp::IMAGE_PREFIX_LABEL, OFX_UI_FONT_SMALL) );
+    this->reproductionImagePrefixTextInput = new ofxUITextInput("ImagePrefix", "imagem_", 200, 18);
+    this->reproductionImagePrefixTextInput->setDrawOutline(true);
+    this->reproductionImagePrefixTextInput->setDrawOutlineHighLight(true);
+    this->reproductionPanel->addWidgetRight(this->reproductionImagePrefixTextInput);
+    this->textInputs.push_back(this->reproductionImagePrefixTextInput);
 
+    this->reproductionPanel->addWidgetDown( new ofxUILabel(250, ofApp::MAX_FRAME_TIME_LABEL, OFX_UI_FONT_SMALL) );
+    this->cycleMaxTimeTextInput = new ofxUITextInput("MaxCycleTime", "30", 80, 18);
+    this->cycleMaxTimeTextInput->setOnlyNumericInput(true);
+    this->cycleMaxTimeTextInput->setDrawOutline(true);
+    this->cycleMaxTimeTextInput->setDrawOutlineHighLight(true);
+    this->reproductionPanel->addWidgetRight(this->cycleMaxTimeTextInput);
+    this->textInputs.push_back(this->cycleMaxTimeTextInput);
 
+    this->reproductionPanel->addWidgetDown( new ofxUILabel(250, ofApp::ITERATION_NUMBER_LABEL, OFX_UI_FONT_SMALL) );
+    this->divisionsMaxNumberTextInput = new ofxUITextInput("DivisionsNumber", "7", 80, 18);
+    this->divisionsMaxNumberTextInput->setOnlyNumericInput(true);
+    this->divisionsMaxNumberTextInput->setDrawOutline(true);
+    this->divisionsMaxNumberTextInput->setDrawOutlineHighLight(true);
+    this->reproductionPanel->addWidgetRight(this->divisionsMaxNumberTextInput);
+    this->textInputs.push_back(this->divisionsMaxNumberTextInput);
+
+    this->showAtStartupToggle = new ofxUIToggle(ofApp::SHOW_ON_START_LABEL, true, 16, 16);
+    this->showAtStartupToggle->setDrawOutline(true);
+    this->gui->addWidgetDown(this->showAtStartupToggle);
+
+    this->fullScreenToggle = new ofxUIToggle(ofApp::FULL_SCREEN_LABEL, true, 16, 16);
+    this->fullScreenToggle->setDrawOutline(true);
+    this->gui->addWidgetDown(this->fullScreenToggle);
+
+    this->gui->addSpacer();
+
+    ofxUILabelButton* saveButton = this->gui->addLabelButton(ofApp::SAVE_LABEL, false, 100, 20);
+    saveButton->setDrawFill(true);
+    saveButton->setDrawOutline(true);
+
+    ofxUILabelButton* cancelButton = new ofxUILabelButton(ofApp::CANCEL_LABEL, false, 100, 20);
+    cancelButton->setDrawFill(true);
+    cancelButton->setDrawOutline(true);
+    this->gui->addWidgetRight(cancelButton);
+    this->gui->addSpacer();
+
+    this->gui->addLabel("Metrônomo - Andrei Thomaz, 2015");
+    this->gui->addLabel("Integrante do projeto Máquinas do Tempo, desenvolvido com apoio da Bolsa de Artes Visual da Funarte 2014");
+    this->gui->addLabel("Desenvolvido em C++ / OpenFrameworks e distribuído sob a licença MPL");
+    this->gui->addLabel("Programação por Andrei Thomaz e Vitor Andrioli");
+    this->gui->addSpacer();
+
+    this->gui->addLabel("Realização");
+    this->gui->addImageButton(ofApp::SUPPORT_BUTTON_NAME, "funarte.png", false, 509, 60);
 
     ofAddListener(this->gui->newGUIEvent, this, &ofApp::guiEvent);
     ofAddListener(this->recordPanel->newGUIEvent, this, &ofApp::recordPanelEvent);
+    ofAddListener(this->rotationPanel->newGUIEvent, this, &ofApp::rotationPanelEvent);
+    ofAddListener(this->reproductionPanel->newGUIEvent, this, &ofApp::reproductionPanelEvent);
+
+    this->recordPanel->loadSettings("record.xml");
+    this->reproductionPanel->loadSettings("reproduction.xml");
+    this->gui->loadSettings("settings.xml");
+
+    this->applyConfigurationChanges();
+
+    ofLog() << "this->recordToggle->getValue(): " << this->recordToggle->getValue();
+    ofLog() << "this->reproductionToggle->getValue(): " << this->reproductionToggle->getValue();
+
+    if (this->showAtStartup) {
+        this->showConfigurationPanel();
+    } else {
+        this->hideConfigurationPanel();
+    }
 }
 
 static int previousMetronomes = 0;
@@ -201,6 +275,8 @@ void ofApp::mouseReleased(int x, int y, int button){
 
 //--------------------------------------------------------------
 void ofApp::windowResized(int w, int h){
+    this->gui->setWidth(ofGetWidth());
+    this->gui->setHeight(ofGetHeight());
 
 }
 
@@ -214,11 +290,89 @@ void ofApp::dragEvent(ofDragInfo dragInfo){
 
 }
 
+void ofApp::applyConfigurationChanges() {
+    if (this->zeroRotationToggle->getValue()) {
+        this->rotations = 0;
+    }
+    if (this->ninetyRotationToggle->getValue()) {
+        this->rotations = 1;
+    }
+    else if (this->oneHundredEightyRotationToggle->getValue()) {
+        this->rotations = 2;
+    }
+    else if (this->twoHundredSeventyRotationToggle->getValue()) {
+        this->rotations = 3;
+    }
+
+    this->zeroRotationToggle->setValue(this->rotations == 0);
+    this->ninetyRotationToggle->setValue(this->rotations == 1);
+    this->oneHundredEightyRotationToggle->setValue(this->rotations == 2);
+    this->twoHundredSeventyRotationToggle->setValue(this->rotations == 3);
+
+    if (this->rotations % 2 == 0) {
+        this->imageWidth = this->cameraWidthTextInput->getIntValue();
+        this->imageHeight = this->cameraHeightTextInput->getIntValue();
+    }
+    else {
+        this->imageWidth = this->cameraHeightTextInput->getIntValue();
+        this->imageHeight = this->cameraWidthTextInput->getIntValue();
+    }
+
+    this->showAtStartup = this->showAtStartupToggle->getValue();
+    this->fullScreen = this->fullScreenToggle->getValue();
+
+    this->intervalToSave = this->intervalToSaveTextInput->getIntValue();
+    this->recordImagePrefix = this->recordImagePrefixTextInput->getTextString();
+    this->reproductionImagePrefix = this->reproductionImagePrefixTextInput->getTextString();
+    this->cycleMaxTime = this->cycleMaxTimeTextInput->getIntValue();
+    this->divisionsMax = this->divisionsMaxNumberTextInput->getIntValue();
+
+    if (this->fullScreen) {
+        ofSetFullscreen(true);
+    }
+    else {
+        ofSetFullscreen(false);
+        ofSetWindowShape(this->imageWidth, this->imageHeight);
+    }
+
+    this->gui->setWidth(ofGetWidth());
+    this->gui->setHeight(ofGetHeight());
+}
+
 void ofApp::guiEvent(ofxUIEventArgs &e) {
-    if (e.getName() == ofApp::RECORD_LABEL) {
+    ofLog() << "event: " << e.getName();
+    if (e.getName() == ofApp::RECORD_LABEL && e.getToggle()->getValue()) {
         this->showRecordPanel();
-    } else if (e.getName() == ofApp::REPRODUCTION_LABEL) {
+    }
+    else if (e.getName() == ofApp::REPRODUCTION_LABEL && e.getToggle()->getValue()) {
         this->showReproductionPanel();
+    }
+
+    else if (e.getName() == ofApp::SAVE_LABEL) {
+        // catches the click when mouse is released, not pressed
+        if (!e.getButton()->getValue()) {
+            this->recordPanel->saveSettings("record.xml");
+            this->reproductionPanel->saveSettings("reproduction.xml");
+            this->gui->saveSettings("settings.xml");
+            this->applyConfigurationChanges();
+            //this->reset();
+            this->hideConfigurationPanel();
+
+        }
+    }
+    else if (e.getName() == ofApp::CANCEL_LABEL) {
+        // catches the click when mouse is released, not pressed
+        if (!e.getButton()->getValue()) {
+            //this->cancelConfigurationChanges();
+            this->hideConfigurationPanel();
+
+        }
+    }
+    else if (e.getName() == ofApp::SUPPORT_BUTTON_NAME) {
+        // catches the click when mouse is released, not pressed
+        if (!e.getButton()->getValue()) {
+            ofLaunchBrowser("http://www.funarte.gov.br/");
+        }
     }
 
     if (e.getKind() == OFX_UI_WIDGET_TEXTINPUT){
@@ -239,6 +393,35 @@ void ofApp::recordPanelEvent(ofxUIEventArgs &e) {
     }
 }
 
+void ofApp::rotationPanelEvent(ofxUIEventArgs &e) {
+    if (e.getName() == ofApp::ZERO_DEGREES_LABEL && e.getToggle()->getValue()) {
+        this->ninetyRotationToggle->setValue(false);
+        this->oneHundredEightyRotationToggle->setValue(false);
+        this->twoHundredSeventyRotationToggle->setValue(false);
+    }
+    else if (e.getName() == ofApp::NINETY_DEGREES_LABEL && e.getToggle()->getValue()) {
+        this->zeroRotationToggle->setValue(false);
+        this->oneHundredEightyRotationToggle->setValue(false);
+        this->twoHundredSeventyRotationToggle->setValue(false);
+    }
+    else if (e.getName() == ofApp::ONE_HUNDRED_EIGHTY_DEGREES_LABEL && e.getToggle()->getValue()) {
+        this->zeroRotationToggle->setValue(false);
+        this->ninetyRotationToggle->setValue(false);
+        this->twoHundredSeventyRotationToggle->setValue(false);
+    }
+    else if (e.getName() == ofApp::TWO_HUNDRED_SEVENTY_DEGREES_LABEL && e.getToggle()->getValue()) {
+        this->zeroRotationToggle->setValue(false);
+        this->ninetyRotationToggle->setValue(false);
+        this->oneHundredEightyRotationToggle->setValue(false);
+    }
+    if (e.getKind() == OFX_UI_WIDGET_TEXTINPUT){
+        ofxUITextInput *ti = (ofxUITextInput *) e.widget;
+        if (ti->getInputTriggerType() == OFX_UI_TEXTINPUT_ON_FOCUS){
+            this->unfocusAllTextInputs(ti);
+        }
+    }
+}
+
 void ofApp::reproductionPanelEvent(ofxUIEventArgs &e) {
 
     if (e.getKind() == OFX_UI_WIDGET_TEXTINPUT){
@@ -250,24 +433,37 @@ void ofApp::reproductionPanelEvent(ofxUIEventArgs &e) {
 }
 
 void ofApp::showRecordPanel() {
-    this->reproductionToggle->setValue(false);
     this->reproductionPanel->setVisible(false);
     this->recordPanel->setVisible(true);
+    this->rotationPanel->setVisible(true);
+    this->reproductionToggle->setValue(false);
 }
 
 void ofApp::showReproductionPanel() {
-    this->recordToggle->setValue(false);
     this->recordPanel->setVisible(false);
+    this->rotationPanel->setVisible(false);
     this->reproductionPanel->setVisible(true);
+    this->recordToggle->setValue(false);
 }
 
 void ofApp::hideConfigurationPanel() {
     this->gui->setVisible(false);
+    this->recordPanel->setVisible(false);
+    this->reproductionPanel->setVisible(false);
+    this->rotationPanel->setVisible(false);
     ofHideCursor();
 }
 
 void ofApp::showConfigurationPanel() {
     this->gui->setVisible(true);
+
+    if (this->recordToggle->getValue()) {
+        this->showRecordPanel();
+        this->rotationPanel->setVisible(true);
+    } else {
+        this->reproductionPanel->setVisible(true);
+    }
+
     this->gui->disableKeyEventCallbacks();
     ofShowCursor();
 }

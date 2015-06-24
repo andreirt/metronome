@@ -18,7 +18,7 @@ private:
     ofxUICanvas *gui;
     ofxUICanvas *recordPanel;
     ofxUICanvas *reproductionPanel;
-    ofxUICanvas *imagePanel;
+    ofxUICanvas *rotationPanel;
 
     ofxUIToggle *recordToggle;
     ofxUIToggle *reproductionToggle;
@@ -30,21 +30,32 @@ private:
     int rotations;
 
     ofxUIToggle* showAtStartupToggle;
-
     ofxUIToggle* fullScreenToggle;
+    bool showAtStartup;
+    bool fullScreen;
 
     std::vector<ofxUITextInput*> textInputs;
     ofxUIDropDownList* cameraList;
+    int selectedCameraIndex;
 
     ofxUITextInput *cameraWidthTextInput;
     ofxUITextInput *cameraHeightTextInput;
+    int imageWidth;
+    int imageHeight;
 
     ofxUITextInput *intervalToSaveTextInput;
-    int intervalToSaveImage;
+    int intervalToSave;
 
-    ofxUITextInput *imagePrefixTextInput;
+    ofxUITextInput *recordImagePrefixTextInput;
+    ofxUITextInput *reproductionImagePrefixTextInput;
+    string recordImagePrefix;
+    string reproductionImagePrefix;
+
     ofxUITextInput *cycleMaxTimeTextInput;
+    int cycleMaxTime;
+
     ofxUITextInput *divisionsMaxNumberTextInput;
+    int divisionsMax;
 
     const static string RECORD_LABEL;
     const static string CAMERA_LABEL;
@@ -65,6 +76,9 @@ private:
     const static string GENERAL_LABEL;
     const static string FULL_SCREEN_LABEL;
     const static string SHOW_ON_START_LABEL;
+    const static string SAVE_LABEL;
+    const static string CANCEL_LABEL;
+    const static string SUPPORT_BUTTON_NAME;
 
 	public:
 		void setup();
@@ -83,11 +97,13 @@ private:
 
         void guiEvent(ofxUIEventArgs &e);
         void recordPanelEvent(ofxUIEventArgs &e);
+        void rotationPanelEvent(ofxUIEventArgs &e);
         void reproductionPanelEvent(ofxUIEventArgs &e);
-		void hideConfigurationPanel();
+        void hideConfigurationPanel();
 		void showConfigurationPanel();
 		void showRecordPanel();
 		void showReproductionPanel();
 		void unfocusAllTextInputs(ofxUITextInput* except);
+		void applyConfigurationChanges();
 
 };

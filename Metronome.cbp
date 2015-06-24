@@ -424,10 +424,28 @@
 		<Unit filename="icon.rc">
 			<Option compilerVar="WINDRES" />
 		</Unit>
+		<Unit filename="src/GrayscaleSequence.cpp">
+			<Option virtualFolder="src/" />
+		</Unit>
+		<Unit filename="src/GrayscaleSequence.h">
+			<Option virtualFolder="src/" />
+		</Unit>
 		<Unit filename="src/Metronome.cpp">
 			<Option virtualFolder="src/" />
 		</Unit>
 		<Unit filename="src/Metronome.h">
+			<Option virtualFolder="src/" />
+		</Unit>
+		<Unit filename="src/TimeRepresentation.cpp">
+			<Option virtualFolder="src/" />
+		</Unit>
+		<Unit filename="src/TimeRepresentation.h">
+			<Option virtualFolder="src/" />
+		</Unit>
+		<Unit filename="src/Timelapse.cpp">
+			<Option virtualFolder="src/" />
+		</Unit>
+		<Unit filename="src/Timelapse.h">
 			<Option virtualFolder="src/" />
 		</Unit>
 		<Unit filename="src/main.cpp">
