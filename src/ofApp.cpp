@@ -65,17 +65,17 @@ void ofApp::setup(){
 
     this->gui->addSpacer("spacer", 1) ;
 
-    this->recordPanel = new ofxUICanvas (0, 0, 450, 260);
+    this->recordPanel = new ofxUICanvas (0, 0, 450, 200);
     this->recordPanel->setFontSize(OFX_UI_FONT_SMALL, 8);
     this->recordPanel->setWidgetSpacing(10);
     this->gui->addWidgetSouthOf(this->recordPanel, "spacer");
 
-    this->rotationPanel = new ofxUICanvas(0, 0, 300, 260);
+    this->rotationPanel = new ofxUICanvas(0, 0, 300, 200);
     this->rotationPanel->setFontSize(OFX_UI_FONT_SMALL, 8);
     this->rotationPanel->setWidgetSpacing(10);
     this->gui->addWidgetRight(this->rotationPanel);
 
-    this->reproductionPanel = new ofxUICanvas(0, 0, ofGetWidth(), 260);
+    this->reproductionPanel = new ofxUICanvas(0, 0, ofGetWidth(), 200);
     this->reproductionPanel->setFontSize(OFX_UI_FONT_SMALL, 8);
     this->reproductionPanel->setWidgetSpacing(10);
     this->gui->addWidgetSouthOf(this->reproductionPanel, "spacer");
