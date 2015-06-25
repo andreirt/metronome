@@ -27,11 +27,6 @@ const string ofApp::SUPPORT_BUTTON_NAME = "support";
 
 //--------------------------------------------------------------
 void ofApp::setup(){
-    this->grayscale = new GrayscaleSequence();
-
-    this->timelapse = new Timelapse("imagem_");
-    this->metronome = new Metronome( this->timelapse, 0, 0, 0, ofGetWidth(), ofGetHeight(), 1000 );
-
     ofSetFrameRate(60);
     ofBackground(0, 0, 0);
 
@@ -254,8 +249,6 @@ void ofApp::saveCurrentImage() {
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-    //this->metronome->draw();
-
     if (this->record) {
         this->grabber->setAnchorPercent( 0.5, 0.5 );
         ofPushMatrix();
@@ -264,6 +257,8 @@ void ofApp::draw(){
         ofRotateZ(90*this->rotations);
         this->grabber->draw(0, 0);
         ofPopMatrix();
+    } else if (this->reproduction) {
+        this->metronome->draw();
     }
 }
 
@@ -402,7 +397,19 @@ void ofApp::applyConfigurationChanges() {
 
         this->lastTimeImageWasSaved = 0;
     } else if (this->reproduction) {
-        this->grabber->close();
+        if (this->grabber != NULL) {
+            if (this->grabber->isInitialized()) {
+                this->grabber->close();
+                delete this->grabber;
+            }
+        }
+
+        this->grayscale = new GrayscaleSequence();
+
+        this->timelapse = new Timelapse(this->reproductionImagePrefix);
+        this->metronome = new Metronome( this->timelapse, 0, 0, 0, this->imageWidth, this->imageHeight, 1000 );
+
+
     }
 }
 
