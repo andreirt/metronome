@@ -22,6 +22,8 @@ private:
 
     ofxUIToggle *recordToggle;
     ofxUIToggle *reproductionToggle;
+    bool reproduction;
+    bool record;
 
     ofxUIToggle* zeroRotationToggle;
     ofxUIToggle* ninetyRotationToggle;

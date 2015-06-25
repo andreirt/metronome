@@ -95,7 +95,7 @@ void ofApp::setup(){
     this->cameraList->setAllowMultiple(false);
     this->cameraList->setDrawOutline(true);
 
-    this->recordPanel->addWidgetDown( new ofxUILabel(180, ofApp::IMAGE_WIDTH_LABEL, OFX_UI_FONT_SMALL) );
+    this->recordPanel->addWidgetDown( new ofxUILabel(210, ofApp::IMAGE_WIDTH_LABEL, OFX_UI_FONT_SMALL) );
     this->cameraWidthTextInput = new ofxUITextInput("CameraWidth", "1920", 80, 18);
     this->cameraWidthTextInput->setOnlyNumericInput(true);
     this->cameraWidthTextInput->setDrawOutline(true);
@@ -103,7 +103,7 @@ void ofApp::setup(){
     this->recordPanel->addWidgetRight(this->cameraWidthTextInput);
     this->textInputs.push_back(this->cameraWidthTextInput);
 
-    this->recordPanel->addWidgetDown( new ofxUILabel(180, ofApp::IMAGE_HEIGHT_LABEL, OFX_UI_FONT_SMALL) );
+    this->recordPanel->addWidgetDown( new ofxUILabel(210, ofApp::IMAGE_HEIGHT_LABEL, OFX_UI_FONT_SMALL) );
     this->cameraHeightTextInput = new ofxUITextInput("CameraHeight", "1080", 80, 18);
     this->cameraHeightTextInput->setOnlyNumericInput(true);
     this->cameraHeightTextInput->setDrawOutline(true);
@@ -111,20 +111,20 @@ void ofApp::setup(){
     this->recordPanel->addWidgetRight(this->cameraHeightTextInput);
     this->textInputs.push_back(this->cameraHeightTextInput);
 
-    this->recordPanel->addWidgetDown(new ofxUILabel(180, ofApp::IMAGE_PREFIX_LABEL, OFX_UI_FONT_SMALL));
+    this->recordPanel->addWidgetDown(new ofxUILabel(210, ofApp::IMAGE_PREFIX_LABEL, OFX_UI_FONT_SMALL));
     this->recordImagePrefixTextInput = new ofxUITextInput("ImagePrefix", "imagem_", 200, 18);
     this->recordImagePrefixTextInput->setDrawOutline(true);
     this->recordImagePrefixTextInput->setDrawOutlineHighLight(true);
     this->recordPanel->addWidgetRight(this->recordImagePrefixTextInput);
     this->textInputs.push_back(this->recordImagePrefixTextInput);
 
-    this->recordPanel->addWidgetDown(new ofxUILabel(180, ofApp::SAVE_IMAGE_LABEL, OFX_UI_FONT_SMALL));
+    this->recordPanel->addWidgetDown(new ofxUILabel(210, ofApp::SAVE_IMAGE_LABEL, OFX_UI_FONT_SMALL));
     this->intervalToSaveTextInput = new ofxUITextInput("A cada", "15", 60, 18);
     this->intervalToSaveTextInput->setOnlyNumericInput(true);
     this->intervalToSaveTextInput->setDrawOutline(true);
     this->intervalToSaveTextInput->setDrawOutlineHighLight(true);
     this->recordPanel->addWidgetRight( this->intervalToSaveTextInput );
-    this->recordPanel->addWidgetRight( new ofxUILabel(10, "minutos", OFX_UI_FONT_SMALL) );
+    this->recordPanel->addWidgetRight( new ofxUILabel(100, "minutos", OFX_UI_FONT_SMALL) );
     this->textInputs.push_back(this->intervalToSaveTextInput);
 
     this->rotations = 0;
@@ -148,22 +148,23 @@ void ofApp::setup(){
     this->rotationPanel->addWidgetDown(this->twoHundredSeventyRotationToggle);
 
 
-    this->reproductionPanel->addWidgetDown( new ofxUILabel(250, ofApp::IMAGE_PREFIX_LABEL, OFX_UI_FONT_SMALL) );
+    this->reproductionPanel->addWidgetDown( new ofxUILabel(290, ofApp::IMAGE_PREFIX_LABEL, OFX_UI_FONT_SMALL) );
     this->reproductionImagePrefixTextInput = new ofxUITextInput("ImagePrefix", "imagem_", 200, 18);
     this->reproductionImagePrefixTextInput->setDrawOutline(true);
     this->reproductionImagePrefixTextInput->setDrawOutlineHighLight(true);
     this->reproductionPanel->addWidgetRight(this->reproductionImagePrefixTextInput);
     this->textInputs.push_back(this->reproductionImagePrefixTextInput);
 
-    this->reproductionPanel->addWidgetDown( new ofxUILabel(250, ofApp::MAX_FRAME_TIME_LABEL, OFX_UI_FONT_SMALL) );
+    this->reproductionPanel->addWidgetDown( new ofxUILabel(290, ofApp::MAX_FRAME_TIME_LABEL, OFX_UI_FONT_SMALL) );
     this->cycleMaxTimeTextInput = new ofxUITextInput("MaxCycleTime", "30", 80, 18);
     this->cycleMaxTimeTextInput->setOnlyNumericInput(true);
     this->cycleMaxTimeTextInput->setDrawOutline(true);
     this->cycleMaxTimeTextInput->setDrawOutlineHighLight(true);
     this->reproductionPanel->addWidgetRight(this->cycleMaxTimeTextInput);
+    this->reproductionPanel->addWidgetRight( new ofxUILabel(100, "segundos", OFX_UI_FONT_SMALL) );
     this->textInputs.push_back(this->cycleMaxTimeTextInput);
 
-    this->reproductionPanel->addWidgetDown( new ofxUILabel(250, ofApp::ITERATION_NUMBER_LABEL, OFX_UI_FONT_SMALL) );
+    this->reproductionPanel->addWidgetDown( new ofxUILabel(290, ofApp::ITERATION_NUMBER_LABEL, OFX_UI_FONT_SMALL) );
     this->divisionsMaxNumberTextInput = new ofxUITextInput("DivisionsNumber", "7", 80, 18);
     this->divisionsMaxNumberTextInput->setOnlyNumericInput(true);
     this->divisionsMaxNumberTextInput->setDrawOutline(true);
@@ -334,6 +335,9 @@ void ofApp::applyConfigurationChanges() {
         ofSetFullscreen(false);
         ofSetWindowShape(this->imageWidth, this->imageHeight);
     }
+
+    this->record = this->recordToggle->getValue();
+    this->reproduction = this->reproductionToggle->getValue();
 
     this->gui->setWidth(ofGetWidth());
     this->gui->setHeight(ofGetHeight());
