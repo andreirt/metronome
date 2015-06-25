@@ -112,7 +112,7 @@ void ofApp::setup(){
     this->textInputs.push_back(this->cameraHeightTextInput);
 
     this->recordPanel->addWidgetDown(new ofxUILabel(210, ofApp::IMAGE_PREFIX_LABEL, OFX_UI_FONT_SMALL));
-    this->recordImagePrefixTextInput = new ofxUITextInput("ImagePrefix", "imagem_", 200, 18);
+    this->recordImagePrefixTextInput = new ofxUITextInput("ImagePrefix", "imagem", 200, 18);
     this->recordImagePrefixTextInput->setDrawOutline(true);
     this->recordImagePrefixTextInput->setDrawOutlineHighLight(true);
     this->recordPanel->addWidgetRight(this->recordImagePrefixTextInput);
@@ -149,7 +149,7 @@ void ofApp::setup(){
 
 
     this->reproductionPanel->addWidgetDown( new ofxUILabel(290, ofApp::IMAGE_PREFIX_LABEL, OFX_UI_FONT_SMALL) );
-    this->reproductionImagePrefixTextInput = new ofxUITextInput("ImagePrefix", "imagem_", 200, 18);
+    this->reproductionImagePrefixTextInput = new ofxUITextInput("ImagePrefix", "imagem", 200, 18);
     this->reproductionImagePrefixTextInput->setDrawOutline(true);
     this->reproductionImagePrefixTextInput->setDrawOutlineHighLight(true);
     this->reproductionPanel->addWidgetRight(this->reproductionImagePrefixTextInput);
@@ -207,33 +207,64 @@ void ofApp::setup(){
     ofAddListener(this->reproductionPanel->newGUIEvent, this, &ofApp::reproductionPanelEvent);
 
     this->recordPanel->loadSettings("record.xml");
+    this->rotationPanel->loadSettings("rotation.xml");
     this->reproductionPanel->loadSettings("reproduction.xml");
     this->gui->loadSettings("settings.xml");
 
     this->applyConfigurationChanges();
-
-    ofLog() << "this->recordToggle->getValue(): " << this->recordToggle->getValue();
-    ofLog() << "this->reproductionToggle->getValue(): " << this->reproductionToggle->getValue();
 
     if (this->showAtStartup) {
         this->showConfigurationPanel();
     } else {
         this->hideConfigurationPanel();
     }
+
+    this->lastTimeImageWasSaved = 0;
 }
 
 static int previousMetronomes = 0;
 
 //--------------------------------------------------------------
 void ofApp::update(){
-    Metronome::startCycle();
-    this->metronome->update();
+    if (this->reproduction) {
+        Metronome::startCycle();
+        this->metronome->update();
+    } else if (this->record) {
+        this->grabber->update();
+        if (this->grabber->isFrameNew()) {
+            if (ofGetElapsedTimef() - this->lastTimeImageWasSaved > this->intervalToSave * 60) {
+                this->saveCurrentImage();
+                this->lastTimeImageWasSaved = ofGetElapsedTimef();
+            }
+        }
+    }
+}
 
+void ofApp::saveCurrentImage() {
+    char fileNameSuffix[23];
+    sprintf( fileNameSuffix, "_%04d_%02d_%02d_%02d_%02d_%02d.png", ofGetYear(), ofGetMonth(), ofGetDay(), ofGetHours(), ofGetMinutes(), ofGetSeconds() );
+
+    string fileName = this->recordImagePrefix + fileNameSuffix;
+
+    ofPixels screenPixels;
+    screenPixels = this->grabber->getPixelsRef();
+    screenPixels.rotate90( this->rotations );
+    ofSaveImage(screenPixels, fileName, OF_IMAGE_QUALITY_BEST);
 }
 
 //--------------------------------------------------------------
 void ofApp::draw(){
-    this->metronome->draw();
+    //this->metronome->draw();
+
+    if (this->record) {
+        this->grabber->setAnchorPercent( 0.5, 0.5 );
+        ofPushMatrix();
+        ofTranslate( ofGetWidth()/2, ofGetHeight()/2 );
+        ofScale( this->scale, this->scale );
+        ofRotateZ(90*this->rotations);
+        this->grabber->draw(0, 0);
+        ofPopMatrix();
+    }
 }
 
 //--------------------------------------------------------------
@@ -278,6 +309,9 @@ void ofApp::mouseReleased(int x, int y, int button){
 void ofApp::windowResized(int w, int h){
     this->gui->setWidth(ofGetWidth());
     this->gui->setHeight(ofGetHeight());
+    float scaleV = (float) ofGetHeight() / (float) this->imageHeight;
+    float scaleH = (float) ofGetWidth() / (float) this->imageWidth;
+    this->scale = min(scaleV, scaleH);
 
 }
 
@@ -341,6 +375,35 @@ void ofApp::applyConfigurationChanges() {
 
     this->gui->setWidth(ofGetWidth());
     this->gui->setHeight(ofGetHeight());
+
+    if (this->record) {
+        if (this->grabber != NULL) {
+            if (this->grabber->isInitialized()) {
+                this->grabber->close();
+                delete this->grabber;
+                this->grabber = new ofVideoGrabber();
+            }
+        }
+
+        vector<int> selectedCamera = this->cameraList->getSelectedIndeces();
+        if (selectedCamera.size() > 0) {
+            this->grabber->setDeviceID( selectedCamera[0] - 1 );
+        }
+        else {
+            this->grabber->setDeviceID( 0 );
+        }
+
+        this->grabber->setDesiredFrameRate(30);
+        this->grabber->initGrabber(this->cameraWidthTextInput->getIntValue(), this->cameraHeightTextInput->getIntValue());
+
+        float scaleV = (float) ofGetHeight() / (float) this->imageHeight;
+        float scaleH = (float) ofGetWidth() / (float) this->imageWidth;
+        this->scale = min(scaleV, scaleH);
+
+        this->lastTimeImageWasSaved = 0;
+    } else if (this->reproduction) {
+        this->grabber->close();
+    }
 }
 
 void ofApp::guiEvent(ofxUIEventArgs &e) {
@@ -356,6 +419,7 @@ void ofApp::guiEvent(ofxUIEventArgs &e) {
         // catches the click when mouse is released, not pressed
         if (!e.getButton()->getValue()) {
             this->recordPanel->saveSettings("record.xml");
+            this->rotationPanel->saveSettings("rotation.xml");
             this->reproductionPanel->saveSettings("reproduction.xml");
             this->gui->saveSettings("settings.xml");
             this->applyConfigurationChanges();

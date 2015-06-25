@@ -44,6 +44,9 @@ private:
     ofxUITextInput *cameraHeightTextInput;
     int imageWidth;
     int imageHeight;
+    float scale;
+
+    float lastTimeImageWasSaved;
 
     ofxUITextInput *intervalToSaveTextInput;
     int intervalToSave;
@@ -107,5 +110,7 @@ private:
 		void showReproductionPanel();
 		void unfocusAllTextInputs(ofxUITextInput* except);
 		void applyConfigurationChanges();
+		void saveCurrentImage();
+
 
 };
