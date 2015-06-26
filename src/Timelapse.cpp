@@ -71,7 +71,20 @@ void Timelapse::draw( float time, float x, float y, float width, float height )
         }
 
         if (this->images[index].isAllocated()) {
-            this->images[index].drawSubsection( x, y, width, height, x, y );
+            ofFbo fbo;
+            fbo.allocate(ofGetWidth(), ofGetHeight());
+            this->images[index].setAnchorPercent(0.5, 0.5);
+            fbo.begin();
+                ofPushMatrix();
+                ofTranslate(ofGetWidth()/2, ofGetHeight()/2);
+                this->images[index].draw(0, 0);
+                ofPopMatrix();
+            fbo.end();
+
+            ofTexture texture = fbo.getTextureReference();
+            texture.drawSubsection( x, y, width, height, x, y );
+
+            //this->images[index].drawSubsection( x, y, width, height, x, y );
         }
 
     }

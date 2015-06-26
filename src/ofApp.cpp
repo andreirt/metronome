@@ -375,6 +375,7 @@ void ofApp::applyConfigurationChanges() {
     this->gui->setWidth(ofGetWidth());
     this->gui->setHeight(ofGetHeight());
 
+
     if (this->record) {
         if (this->grabber != NULL) {
             if (this->grabber->isInitialized()) {
@@ -385,6 +386,7 @@ void ofApp::applyConfigurationChanges() {
         }
 
         vector<int> selectedCamera = this->cameraList->getSelectedIndeces();
+
         if (selectedCamera.size() > 0) {
             this->grabber->setDeviceID( selectedCamera[0] - 1 );
         }
@@ -400,19 +402,20 @@ void ofApp::applyConfigurationChanges() {
         this->scale = min(scaleV, scaleH);
 
         this->lastTimeImageWasSaved = 0;
+
+
     } else if (this->reproduction) {
         if (this->grabber != NULL) {
             if (this->grabber->isInitialized()) {
                 this->grabber->close();
-                delete this->grabber;
+                //delete this->grabber;
             }
         }
 
         this->grayscale = new GrayscaleSequence();
 
         this->timelapse = new Timelapse(this->reproductionImagePrefix);
-        this->metronome = new Metronome( this->timelapse, 0, this->divisionsMax, 0, 0, ofGetWidth(), ofGetHeight(), this->cycleMaxTime );
-
+        this->metronome = new Metronome( this->timelapse, 0, this->divisionsMax, 0, 0, this->imageWidth, this->imageHeight, this->cycleMaxTime );
 
     }
 }
@@ -434,7 +437,6 @@ void ofApp::guiEvent(ofxUIEventArgs &e) {
             this->reproductionPanel->saveSettings("reproduction.xml");
             this->gui->saveSettings("settings.xml");
             this->applyConfigurationChanges();
-            //this->reset();
             this->hideConfigurationPanel();
 
         }
