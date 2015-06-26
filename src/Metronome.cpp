@@ -5,7 +5,6 @@
 const int Metronome::DIRECTION_FORWARD = 1;
 const int Metronome::DIRECTION_BACKWARDS = 2;
 const int Metronome::DIRECTION_STOPPED = 3;
-const int Metronome::MAX_ITERATION = 7;
 
 static int counter = 0;
 static int cycle_counter = 0;
@@ -15,7 +14,7 @@ void Metronome::startCycle()
     cycle_counter = 0;
 }
 
-Metronome::Metronome( TimeRepresentation* timeRepresentation, int iteration, float x, float y, float width, float height, unsigned int frames )
+Metronome::Metronome( TimeRepresentation* timeRepresentation, int iteration, int maxInteractions, float x, float y, float width, float height, unsigned int frames )
 {
     this->x = x;
     this->y = y;
@@ -23,6 +22,7 @@ Metronome::Metronome( TimeRepresentation* timeRepresentation, int iteration, flo
     this->height = height;
     this->timeRepresentation = timeRepresentation;
     this->iteration = iteration;
+    this->maxInteractions = maxInteractions;
 
     if (frames > 0) {
          this->frames = frames;
@@ -55,6 +55,7 @@ Metronome::~Metronome()
 bool Metronome::hasStopped()
 {
     return this->direction == Metronome::DIRECTION_STOPPED && this->firstHalf == NULL && this->secondHalf == NULL;
+
 }
 
 void Metronome::update()
@@ -74,7 +75,7 @@ void Metronome::update()
             --this->currentFrame;
 
             if (this->currentFrame == 0) {
-                if (!this->hasBeenDivided && this->iteration < Metronome::MAX_ITERATION) {
+                if (!this->hasBeenDivided && this->iteration < this->maxInteractions) {
 
                     ofLog() << "splitting: " << this->x << ", " << this->y << ", " << this->width << ", " << this->height;
 
@@ -82,11 +83,13 @@ void Metronome::update()
                     if (this->width > this->height) {
                         this->firstHalf = new Metronome( this->timeRepresentation,
                                                         this->iteration + 1,
+                                                        this->maxInteractions,
                                                         this->x, this->y,
                                                         this->width / 2, this->height,
                                                         this->frames );
                         this->secondHalf = new Metronome( this->timeRepresentation,
                                                          this->iteration + 1,
+                                                         this->maxInteractions,
                                                          this->x + this->width / 2, this->y,
                                                          this->width / 2, this->height,
                                                          0 );
@@ -94,11 +97,13 @@ void Metronome::update()
                     else {
                         this->firstHalf = new Metronome( this->timeRepresentation,
                                                         this->iteration + 1,
+                                                        this->maxInteractions,
                                                         this->x, this->y,
                                                         this->width, this->height / 2,
                                                         this->frames );
                         this->secondHalf = new Metronome( this->timeRepresentation,
                                                          this->iteration + 1,
+                                                         this->maxInteractions,
                                                          this->x, this->y + this->height / 2,
                                                          this->width, this->height / 2,
                                                          0 );

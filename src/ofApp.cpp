@@ -156,7 +156,7 @@ void ofApp::setup(){
     this->cycleMaxTimeTextInput->setDrawOutline(true);
     this->cycleMaxTimeTextInput->setDrawOutlineHighLight(true);
     this->reproductionPanel->addWidgetRight(this->cycleMaxTimeTextInput);
-    this->reproductionPanel->addWidgetRight( new ofxUILabel(100, "segundos", OFX_UI_FONT_SMALL) );
+    this->reproductionPanel->addWidgetRight( new ofxUILabel(650, "frames (o programa roda a 30 frames por segundo)", OFX_UI_FONT_SMALL) );
     this->textInputs.push_back(this->cycleMaxTimeTextInput);
 
     this->reproductionPanel->addWidgetDown( new ofxUILabel(290, ofApp::ITERATION_NUMBER_LABEL, OFX_UI_FONT_SMALL) );
@@ -224,6 +224,10 @@ void ofApp::update(){
     if (this->reproduction) {
         Metronome::startCycle();
         this->metronome->update();
+        if (this->metronome->hasStopped()) {
+            this->metronome = new Metronome( this->timelapse, 0, this->divisionsMax, 0, 0, ofGetWidth(), ofGetHeight(), this->cycleMaxTime );
+        }
+
     } else if (this->record) {
         this->grabber->update();
         if (this->grabber->isFrameNew()) {
@@ -407,7 +411,7 @@ void ofApp::applyConfigurationChanges() {
         this->grayscale = new GrayscaleSequence();
 
         this->timelapse = new Timelapse(this->reproductionImagePrefix);
-        this->metronome = new Metronome( this->timelapse, 0, 0, 0, this->imageWidth, this->imageHeight, 1000 );
+        this->metronome = new Metronome( this->timelapse, 0, this->divisionsMax, 0, 0, ofGetWidth(), ofGetHeight(), this->cycleMaxTime );
 
 
     }

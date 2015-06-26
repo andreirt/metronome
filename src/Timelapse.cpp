@@ -9,6 +9,7 @@ Timelapse::Timelapse( string prefix )
     ofDirectory dataFolder(".");
     dataFolder.allowExt("png");
     int numberOfPngFiles = dataFolder.listDir();
+
     for (int i = 0; i < numberOfPngFiles; i++) {
 
         string filename = dataFolder.getName(i);
@@ -34,9 +35,9 @@ Timelapse::~Timelapse()
 
 void Timelapse::draw( float time, float x, float y, float width, float height )
 {
-    int fileNumber = (int) floorf(time * 44.0);
-    if (fileNumber > 43)
-        fileNumber = 43;
+    int fileNumber = (int) floorf(time * this->images.size());
+    if (fileNumber > this->images.size()-1)
+        fileNumber = this->images.size()-1;
 
     int offset = 0;
     int index = fileNumber;

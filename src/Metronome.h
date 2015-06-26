@@ -6,14 +6,14 @@
 class Metronome
 {
 public:
-    Metronome( TimeRepresentation* timeRepresentation, int iteration, float x, float y, float width, float height, unsigned int frames = 0 );
+    Metronome( TimeRepresentation* timeRepresentation, int iteration, int maxInteractions, float x, float y, float width, float height, unsigned int frames = 0 );
     virtual ~Metronome();
 
     void update();
     void draw();
     int getNumChildren();
     static void startCycle();
-
+    bool hasStopped();
 
 protected:
 private:
@@ -22,6 +22,7 @@ private:
     float width;
     float height;
     unsigned int frames;
+    int maxInteractions;
     TimeRepresentation* timeRepresentation;
 
     unsigned int iteration;
@@ -36,9 +37,9 @@ private:
     static const int DIRECTION_FORWARD;
     static const int DIRECTION_BACKWARDS;
     static const int DIRECTION_STOPPED;
-    static const int MAX_ITERATION;
 
-    bool hasStopped();
+
+
 };
 
 #endif // METRONOME_H
